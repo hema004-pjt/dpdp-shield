@@ -1,18 +1,24 @@
 import streamlit as st
 from snowflake.snowpark.session import Session
-
-connection_params = {
-    "account": st.secrets["snowflake"]["account"],
-    "user": st.secrets["snowflake"]["user"],
-    "password": st.secrets["snowflake"]["password"],
-    "warehouse": st.secrets["snowflake"]["warehouse"],
-    "database": st.secrets["snowflake"]["database"],
-    "schema": st.secrets["snowflake"]["schema"],
-    "role": st.secrets["snowflake"]["role"],
-}
-
-session = Session.builder.configs(connection_params).create()
 import pandas as pd
+
+def create_session():
+    try:
+        connection_params = {
+            "account": st.secrets["snowflake"]["account"],
+            "user": st.secrets["snowflake"]["user"],
+            "password": st.secrets["snowflake"]["password"],
+            "warehouse": st.secrets["snowflake"]["warehouse"],
+            "database": st.secrets["snowflake"]["database"],
+            "schema": st.secrets["snowflake"]["schema"],
+            "role": st.secrets["snowflake"]["role"],
+        }
+        return Session.builder.configs(connection_params).create()
+    except Exception as e:
+        st.error(f"Connection failed: {e}")
+        st.stop()
+
+session = create_session()
 
 session = get_active_session()
 
