@@ -1,5 +1,17 @@
 import streamlit as st
-from snowflake.snowpark.context import get_active_session
+from snowflake.snowpark.session import Session
+
+connection_params = {
+    "account": st.secrets["snowflake"]["account"],
+    "user": st.secrets["snowflake"]["user"],
+    "password": st.secrets["snowflake"]["password"],
+    "warehouse": st.secrets["snowflake"]["warehouse"],
+    "database": st.secrets["snowflake"]["database"],
+    "schema": st.secrets["snowflake"]["schema"],
+    "role": st.secrets["snowflake"]["role"],
+}
+
+session = Session.builder.configs(connection_params).create()
 import pandas as pd
 
 session = get_active_session()
