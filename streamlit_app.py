@@ -21,11 +21,17 @@ def create_session():
 session = create_session()
 
 def ask_cortex(prompt):
-    clean = prompt.replace("'", "").replace("\\", "")[:2000]
-    result = session.sql(f"""
-        SELECT SNOWFLAKE.CORTEX.COMPLETE('mistral-large2', '{clean}') AS R
-    """).collect()[0]["R"]
-    return result
+    try:
+        clean = prompt.replace("'", "").replace("\\", "")[:1500]
+        result = session.sql(f"""
+            SELECT SNOWFLAKE.CORTEX.COMPLETE(
+                'mistral-large2',
+                '{clean}'
+            ) AS R
+        """).collect()[0]["R"]
+        return result if result else "Please try again."
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 st.set_page_config(page_title="DPDP Shield", page_icon="🛡️", layout="wide")
 
