@@ -20,8 +20,6 @@ def create_session():
 
 session = create_session()
 
-session = get_active_session()
-
 def ask_cortex(prompt):
     clean = prompt.replace("'", "").replace("\\", "")[:2000]
     result = session.sql(f"""
@@ -75,7 +73,6 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
     "📄 Doc Studio", "🚨 Breaches", "📋 Grievances", "👤 My Rights"
 ])
 
-# ── TAB 1: DASHBOARD ──────────────────────────────────────────────────────────
 with tab1:
     st.subheader("📊 National Compliance Overview")
     try:
@@ -153,7 +150,6 @@ with tab1:
         except Exception as e:
             st.error(f"Error: {e}")
 
-# ── TAB 2: AI CHATBOT ─────────────────────────────────────────────────────────
 with tab2:
     st.subheader("🤖 DPDP Cortex AI Assistant")
     st.caption("Powered by Snowflake Cortex Mistral")
@@ -191,12 +187,11 @@ with tab2:
         st.session_state.messages = []
         st.rerun()
 
-# ── TAB 3: RISK AUDITOR ───────────────────────────────────────────────────────
 with tab3:
     st.subheader("⚖️ Compliance Risk Auditor")
     col1, col2 = st.columns(2)
     with col1:
-        practice = st.text_area("Describe your data practice", placeholder="e.g. We collect Aadhaar PAN for loan processing...", height=150)
+        practice = st.text_area("Describe your data practice", placeholder="e.g. We collect Aadhaar PAN for loan processing...", height=150, key="audit_practice")
         org_name = st.text_input("Organisation Name", key="audit_org")
         industry = st.selectbox("Industry", ["Technology", "Financial Services", "Healthcare", "E-Commerce", "Education", "Other"], key="audit_industry")
         if st.button("🔍 Audit Now", use_container_width=True):
@@ -209,7 +204,6 @@ with tab3:
             st.markdown("### 📋 Audit Report")
             st.markdown(f'<div class="section-card">{st.session_state["audit_result"]}</div>', unsafe_allow_html=True)
 
-# ── TAB 4: DOCUMENT STUDIO ────────────────────────────────────────────────────
 with tab4:
     st.subheader("📄 Document Drafting Studio")
     col1, col2 = st.columns(2)
@@ -219,7 +213,7 @@ with tab4:
             "Grievance Redressal Policy", "Data Retention Policy",
             "Breach Notification Letter", "DPO Appointment Letter",
             "Data Processing Agreement"
-        ])
+        ], key="doc_type_select")
         biz_name = st.text_input("Organisation Name", key="doc_org")
         biz_desc = st.text_area("Describe your business and data practices", height=120, key="doc_desc")
         if st.button("📝 Generate Document", use_container_width=True):
@@ -236,7 +230,6 @@ with tab4:
                 file_name=f"{st.session_state['doc_type'].replace(' ','_')}.txt",
                 use_container_width=True)
 
-# ── TAB 5: BREACHES ───────────────────────────────────────────────────────────
 with tab5:
     st.subheader("🚨 Breach Incident Tracker")
     try:
@@ -269,14 +262,13 @@ with tab5:
 
     st.markdown("---")
     st.markdown("#### 🤖 AI Breach Response Playbook")
-    breach_desc = st.text_area("Describe your breach", placeholder="e.g. Unauthorised access exposed 10000 user emails...")
+    breach_desc = st.text_area("Describe your breach", placeholder="e.g. Unauthorised access exposed 10000 user emails...", key="breach_desc")
     if st.button("🚨 Generate Response Plan"):
         if breach_desc:
             with st.spinner("Generating playbook..."):
                 prompt = f"DPDP Act 2023 breach response playbook for: {breach_desc}. Include: 1. IMMEDIATE ACTIONS first 6 hours 2. 72-HOUR NOTIFICATION CHECKLIST Section 8 3. DATA PROTECTION BOARD NOTIFICATION steps 4. AFFECTED USERS NOTIFICATION template 5. CONTAINMENT STEPS 6. PENALTY EXPOSURE."
                 st.markdown(f'<div class="section-card">{ask_cortex(prompt)}</div>', unsafe_allow_html=True)
 
-# ── TAB 6: GRIEVANCES ─────────────────────────────────────────────────────────
 with tab6:
     st.subheader("📋 Grievance Management")
     col1, col2 = st.columns([2, 1])
@@ -313,7 +305,6 @@ with tab6:
                 except Exception as e:
                     st.error(f"Error: {e}")
 
-# ── TAB 7: MY RIGHTS ──────────────────────────────────────────────────────────
 with tab7:
     st.subheader("👤 Citizen Rights Portal")
     col1, col2 = st.columns(2)
@@ -353,7 +344,7 @@ with tab7:
         st.markdown("#### 🤖 Ask About Your Rights")
         rights_q = st.text_area("Describe your situation",
             placeholder="e.g. Company still sending emails after I withdrew consent. What can I do?",
-            height=150)
+            height=150, key="rights_q")
         if st.button("💬 Get Guidance", use_container_width=True):
             if rights_q:
                 with st.spinner("Getting guidance..."):
